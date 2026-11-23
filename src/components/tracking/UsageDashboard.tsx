@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useTrackingStore } from "@/stores/trackingStore";
 
 export function UsageDashboard() {
