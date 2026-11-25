@@ -15,7 +15,7 @@ export const PROVIDERS = {
   antigravity: { name: "Antigravity", icon: "🚀", color: "#4285F4" },
 } as const;
 
-export const APP_NAME = "Status Bar";
+export const APP_NAME = "Switchboard";
 export const APP_VERSION = "0.1.0";
 export const REFRESH_INTERVAL = 30000;
 

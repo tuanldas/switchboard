@@ -33,7 +33,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
             data-tauri-drag-region=""
             className="text-lg font-bold text-zinc-100 tracking-tight"
           >
-            Status Bar
+            Switchboard
           </span>
         </div>
 

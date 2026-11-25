@@ -1,8 +1,8 @@
 {
-  "name": "status-bar",
+  "name": "switchboard",
   "private": true,
   "version": "0.1.0",
-  "description": "AI Coding Tool Account Switcher & Usage Tracker",
+  "description": "All-in-one status bar switcher & token tracker for AI coding tools",
   "type": "module",
   "scripts": {
     "dev": "vite",

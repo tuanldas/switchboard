@@ -1,7 +1,7 @@
 [package]
-name = "status-bar"
+name = "switchboard"
 version = "0.1.0"
-description = "AI Coding Tool Account Switcher & Usage Tracker"
+description = "All-in-one status bar switcher & token tracker for AI coding tools"
 authors = ["tuanldas"]
 edition = "2021"
 

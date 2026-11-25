@@ -38,7 +38,7 @@ fn toggle_main_window(app: &AppHandle) {
 pub fn setup(app: &AppHandle) -> anyhow::Result<()> {
     // 1. Build menu items
     let version = &app.package_info().version;
-    let title_text = format!("Status Bar v{version}");
+    let title_text = format!("Switchboard v{version}");
 
     // Disabled title item displaying the application name and current version
     let title_item = MenuItem::with_id(app, "title", &title_text, false, None::<&str>)?;
