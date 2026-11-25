@@ -1,66 +1,48 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import useAccountStore from "../../stores/accountStore";
-import PROVIDERS from "../../lib/constants";
 
 export interface AddAccountModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+const providerOptions = [
+  { id: "claude_code", name: "Claude Code", icon: "🤖", color: "#D97757", tag: "Anthropic" },
+  { id: "codex", name: "Codex CLI", icon: "🧠", color: "#10A37F", tag: "OpenAI" },
+  { id: "cursor", name: "Cursor IDE", icon: "⚡", color: "#007ACC", tag: "Anysphere" },
+  { id: "antigravity", name: "Antigravity", icon: "🚀", color: "#4285F4", tag: "Google" },
+];
+
 export const AddAccountModal: React.FC<AddAccountModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  // Provider list derived from constants
-  const providerEntries = useMemo(() => {
-    if (!PROVIDERS) return [];
-    if (Array.isArray(PROVIDERS)) {
-      return PROVIDERS.map((p) => ({
-        id: p.id || p.key || p.provider || p.name,
-        name: p.name,
-        icon: p.icon,
-      }));
-    }
-    return Object.entries(PROVIDERS).map(([key, info]) => ({
-      id: key,
-      name: (info as { name?: string; icon?: string })?.name ?? key,
-      icon: (info as { name?: string; icon?: string })?.icon ?? "🤖",
-    }));
-  }, []);
-
-  const defaultProvider = providerEntries[0]?.id || "claude_code";
-
-  // Component state
-  const [provider, setProvider] = useState<string>(defaultProvider);
+  const [provider, setProvider] = useState<string>("claude_code");
   const [name, setName] = useState<string>("");
   const [label, setLabel] = useState<string>("");
   const [submitting, setSubmitting] = useState<boolean>(false);
 
   const { addNewAccount } = useAccountStore();
 
-  // Reset form fields when modal opens
   useEffect(() => {
     if (isOpen) {
-      setProvider(defaultProvider);
+      setProvider("claude_code");
       setName("");
       setLabel("");
       setSubmitting(false);
     }
-  }, [isOpen, defaultProvider]);
+  }, [isOpen]);
 
-  // If !isOpen, return null
-  if (!isOpen) {
-    return null;
-  }
+  if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (submitting) return;
+    if (submitting || !name.trim()) return;
 
     setSubmitting(true);
     try {
       if (addNewAccount) {
-        await addNewAccount(provider, name, label);
+        await addNewAccount(provider, name.trim(), label.trim() || undefined);
       }
       onClose();
     } catch (error) {
@@ -72,101 +54,108 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
-        className="bg-zinc-800 rounded-2xl p-6 w-96 max-w-full text-zinc-100 shadow-xl border border-zinc-700/50"
+        className="glass-panel rounded-3xl p-6 w-[420px] max-w-full text-zinc-100 shadow-2xl border border-white/10"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-bold text-zinc-100 mb-5">Add Account</h2>
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xl">🎛️</span>
+            <div>
+              <h2 className="text-base font-bold text-white tracking-tight">
+                Add AI Profile
+              </h2>
+              <p className="text-xs text-zinc-400">
+                Snapshots active session credentials into Keychain
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-zinc-400 hover:text-white p-1 rounded-lg text-sm"
+          >
+            ✕
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Provider Selection: 4 buttons in a 2x2 grid */}
           <div>
             <label className="block text-xs font-medium text-zinc-300 mb-2">
               Select Provider
             </label>
-            <div className="grid grid-cols-2 gap-2.5">
-              {providerEntries.map((p) => {
-                const isSelected = provider === p.id;
+            <div className="grid grid-cols-2 gap-2">
+              {providerOptions.map((opt) => {
+                const isSelected = provider === opt.id;
                 return (
                   <button
-                    key={p.id}
+                    key={opt.id}
                     type="button"
-                    onClick={() => setProvider(p.id)}
-                    className={`flex items-center gap-2.5 p-3 rounded-lg border text-left cursor-pointer transition-all ${
+                    onClick={() => setProvider(opt.id)}
+                    className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                       isSelected
-                        ? "border-blue-500 bg-zinc-700/80 ring-2 ring-blue-500 text-zinc-100"
-                        : "border-zinc-700 bg-zinc-700/40 hover:bg-zinc-700/70 text-zinc-300"
+                        ? "bg-indigo-600/20 border-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.25)]"
+                        : "bg-black/30 border-white/5 hover:border-white/10"
                     }`}
                   >
-                    <span className="text-xl leading-none">{p.icon}</span>
-                    <span className="text-sm font-medium truncate">
-                      {p.name}
-                    </span>
+                    <span className="text-xl">{opt.icon}</span>
+                    <div className="min-w-0">
+                      <div className="text-xs font-semibold text-white truncate">
+                        {opt.name}
+                      </div>
+                      <div className="text-[10px] text-zinc-400 font-mono">
+                        {opt.tag}
+                      </div>
+                    </div>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Name input field */}
           <div>
-            <label
-              htmlFor="account-name"
-              className="block text-xs font-medium text-zinc-300 mb-1.5"
-            >
-              Name
+            <label className="block text-xs font-medium text-zinc-300 mb-1.5">
+              Profile Name *
             </label>
             <input
-              id="account-name"
               type="text"
-              placeholder="Account name"
+              required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+              placeholder="e.g. Work Claude Pro, Codex Team, Client A"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 transition-colors"
             />
           </div>
 
-          {/* Label input field (optional) */}
           <div>
-            <label
-              htmlFor="account-label"
-              className="block text-xs font-medium text-zinc-300 mb-1.5"
-            >
-              Label{" "}
-              <span className="text-zinc-400 text-xs font-normal">
-                (optional)
-              </span>
+            <label className="block text-xs font-medium text-zinc-300 mb-1.5">
+              Custom Tag / Label (Optional)
             </label>
             <input
-              id="account-label"
               type="text"
-              placeholder="e.g. Work, Personal"
               value={label}
               onChange={(e) => setLabel(e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+              placeholder="e.g. Primary, Secondary, High-Rate"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 transition-colors"
             />
           </div>
 
-          {/* Bottom buttons */}
-          <div className="flex items-center justify-end gap-3 pt-3">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-white/5">
             <button
               type="button"
               onClick={onClose}
-              disabled={submitting}
-              className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-zinc-100 hover:bg-zinc-700/50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+              className="px-4 py-2 rounded-xl text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={submitting}
-              className="px-4 py-2 text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={submitting || !name.trim()}
+              className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_12px_rgba(99,102,241,0.35)]"
             >
-              Add Account
+              {submitting ? "Snapshotting..." : "Save Profile"}
             </button>
           </div>
         </form>

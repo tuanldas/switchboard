@@ -40,15 +40,15 @@ export const App: React.FC = () => {
 
   return (
     <div
-      className="flex h-screen w-screen overflow-hidden bg-zinc-800 text-white select-none"
+      className="flex h-screen w-screen overflow-hidden bg-[#0b0f19] bg-mesh text-zinc-100 select-none antialiased"
       data-testid="app-container"
     >
-      {/* Left sidebar (w-56) with dark background (bg-zinc-900) showing app name "Status Bar" at top and nav items */}
+      {/* Left sidebar */}
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {/* Main content area taking the rest of the width */}
+      {/* Main content area */}
       <main
-        className="flex-1 h-full overflow-y-auto bg-zinc-800 text-white"
+        className="flex-1 h-full overflow-y-auto bg-transparent text-zinc-100 relative"
         role="main"
         data-testid="main-content"
       >
